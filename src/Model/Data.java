@@ -3,24 +3,38 @@ package Model;
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Objects;
 
 public class Data implements Serializable {
+    public static final Long serialVersionUID=123L;
     public static final DateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
     private String sender;
     private String reciever;
+
     private String subject;
     private String Text;
     private Calendar calendar;
+
+    public String getTime() {
+        return time;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
+    }
+
+    private String time;
     private byte[] file;
     private MessageType messageType;
 
-    public Data(String sender, String receiver, String subject, String text, Calendar calendar, byte[] file) {
+    public Data(String sender, String receiver, String subject, String text, String time, byte[] file) {
         this.sender = sender;
         this.reciever = receiver;
         this.subject = subject;
         Text = text;
-        this.calendar = calendar;
+        this.time = time;
         this.file = file;
     }
 
@@ -29,6 +43,14 @@ public class Data implements Serializable {
         this.reciever = reciever;
         this.Text = Text;
         this.messageType = messageType;
+    }
+
+    public Data(String sender, String reciever, String subject, String text, byte[] file) {
+        this.sender = sender;
+        this.reciever = reciever;
+        this.subject = subject;
+        Text = text;
+        this.file = file;
     }
 
     public MessageType getMessageType() {
@@ -95,5 +117,23 @@ public class Data implements Serializable {
                 ", messageText='" + Text + '\'' +
                 ", messageType=" + messageType +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+//        if (this == o) return true;
+//        if (o == null || getClass() != o.getClass()) return false;
+        Data data = (Data) o;
+        if( data.getSender().equals(sender))
+            return true;
+        return false;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = Objects.hash(sender, reciever, subject, Text, calendar, messageType);
+        result = 31 * result + Arrays.hashCode(file);
+        return result;
     }
 }

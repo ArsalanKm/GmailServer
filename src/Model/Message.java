@@ -1,7 +1,9 @@
 package Model;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+
 public class Message implements Serializable {
     static final long serialVersionUID = 42L;
     private String Sender;
@@ -10,11 +12,35 @@ public class Message implements Serializable {
     private UserActions userActions;
     private User user;
     private List<User> AllUSer=new ArrayList<>();
-    private Data date;
+    private List<Data> Mydata=new ArrayList<>();
 
-    public Data getDate() {
-        return date;
+    public Message( List<Data> mydata,UserActions userActions) {
+        this.userActions = userActions;
+        Mydata = mydata;
     }
+
+    private Data data;
+    public Message(Data data) {
+        this.data=data;
+    }
+
+    public Message(Data mailbox, UserActions message) {
+        this.data=mailbox;
+        this.userActions=message;
+    }
+
+
+
+
+    public Data getData() {
+        return data;
+    }
+
+    public void setData(Data data) {
+        this.data = data;
+    }
+
+
 
     public List<User> getAllUSer() {
         return AllUSer;
@@ -24,7 +50,7 @@ public class Message implements Serializable {
         AllUSer = allUSer;
     }
 
-    public Message(String sender, String reciever, String messageText,User user) {
+    public Message(String sender, String reciever, String messageText, User user) {
         Sender = sender;
         this.reciever = reciever;
         MessageText = messageText;
@@ -46,6 +72,13 @@ public class Message implements Serializable {
         AllUSer = allUSer;
     }
 
+    public Message(String sender, String reciever, UserActions userActions, Data data) {
+        Sender = sender;
+        this.reciever = reciever;
+        this.userActions = userActions;
+        this.data = data;
+    }
+
     public Message(String sender, String reciever, String messageText, UserActions userActions, User user) {
         Sender = sender;
         this.reciever = reciever;
@@ -53,6 +86,7 @@ public class Message implements Serializable {
         this.userActions = userActions;
         this.user = user;
     }
+
 
     public String getSender() {
         return Sender;

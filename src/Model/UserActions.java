@@ -2,7 +2,8 @@ package Model;
 
 import java.io.Serializable;
 
-public enum UserActions implements Serializable {
+public enum UserActions {
+
     SignIn,
     Connect,
     Register,
@@ -17,6 +18,7 @@ public enum UserActions implements Serializable {
     RemoveConv,
     Text,
     Not_Online,
-    Change_Setting
-
+    Change_Setting,
+    Message,
+    Log_Out,
 }

@@ -9,11 +9,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class User implements Serializable {
-    public static List<User> GmailUsers = new ArrayList<>();
-    public static List<User> RegisterdUser=new ArrayList<>();
     // 7589968655528222888
     public static final long serialVersionUID = 7589968655528222888L;
-    private String ImageUrl;
+    public static List<User> GmailUsers = new ArrayList<>();
+    public static List<User> RegisterdUser = new ArrayList<>();
+    public  List<Data> Inbox = new ArrayList<>();
+    public  List<Data> Outbox = new ArrayList<>();
+    public List<Data> FavoritesBox=new ArrayList<>();
+    public byte[] UserImageFile = new byte[1024];
+    private String ImageUrl = "C:\\Users\\asus\\Desktop\\GmailMainProject\\src\\Recources\\";
     private String name;
     private String Lastname;
     private String Username;
@@ -28,29 +32,10 @@ public class User implements Serializable {
     private transient ObjectOutputStream outputStream;
     private transient ObjectInputStream inputStream;
     private List<Data> inbox = new ArrayList<>();
-
-    public List<Data> getDeliveryBox() {
-        return DeliveryBox;
-    }
-
-    public void setDeliveryBox(List<Data> deliveryBox) {
-        DeliveryBox = deliveryBox;
-    }
-
     private List<Data> DeliveryBox = new ArrayList<>();
     private List<Data> outbox = new ArrayList<>();
-    public byte[] getUserImageFile() {
-        return UserImageFile;
-    }
-
-    public void setUserImageFile(byte[] userImageFile) {
-        UserImageFile = userImageFile;
-    }
-
-    public byte[] UserImageFile = new byte[1024];
     public User() {
     }
-
     public User(String name, String lastname, String username, String password, String birthDate) {
         this.name = name;
         Lastname = lastname;
@@ -74,6 +59,22 @@ public class User implements Serializable {
 
     public static List<User> getGmailUsers() {
         return GmailUsers;
+    }
+
+    public byte[] getUserImageFile() {
+        return UserImageFile;
+    }
+
+    public void setUserImageFile(byte[] userImageFile) {
+        UserImageFile = userImageFile;
+    }
+
+    public List<Data> getDeliveryBox() {
+        return DeliveryBox;
+    }
+
+    public void setDeliveryBox(List<Data> deliveryBox) {
+        DeliveryBox = deliveryBox;
     }
 
     public List<Data> getOutbox() {
