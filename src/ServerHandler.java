@@ -246,7 +246,7 @@ public class ServerHandler {
                     user.Inbox.add(message.getData());
                 }
 
-            }
+                   }
 
 //            MailBox.remove(message.getData());
 //            System.out.println("recieve is online : mail box size: " + mailboxes.size());

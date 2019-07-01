@@ -8,27 +8,56 @@ import java.util.Calendar;
 import java.util.Objects;
 
 public class Data implements Serializable {
-    public static final Long serialVersionUID=123L;
+    public static final Long serialVersionUID = 123L;
     public static final DateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
     private String sender;
     private String reciever;
-
+    private String SendingFileName;
     private String subject;
     private String Text;
     private Calendar calendar;
+    private byte[] file;
+    private byte[] SendingFile;
+    private MessageType messageType;
+    private String time;
+    private boolean isfavorite=false;
+    private boolean isSenn=false;
 
-    public String getTime() {
-        return time;
+    public boolean isIsfavorite() {
+        return isfavorite;
     }
 
-    public void setTime(String time) {
+    public void setIsfavorite(boolean isfavorite) {
+        this.isfavorite = isfavorite;
+    }
+
+    public boolean isSenn() {
+        return isSenn;
+    }
+
+    public void setSenn(boolean senn) {
+        isSenn = senn;
+    }
+    public Data(String sender, String reciever, String sendingFileName, String subject, byte[] sendingFile, byte[] file, String text, String time) {
+        this.sender = sender;
+        this.reciever = reciever;
+        SendingFileName = sendingFileName;
+        this.subject = subject;
+        Text = text;
+        this.file = file;
+        SendingFile = sendingFile;
         this.time = time;
     }
 
-    private String time;
-    private byte[] file;
-    private MessageType messageType;
-
+    public Data(String sender, String reciever, String subject, String text, byte[] file, byte[] sendingFile, String time) {
+        this.sender = sender;
+        this.reciever = reciever;
+        this.subject = subject;
+        Text = text;
+        this.file = file;
+        SendingFile = sendingFile;
+        this.time = time;
+    }
     public Data(String sender, String receiver, String subject, String text, String time, byte[] file) {
         this.sender = sender;
         this.reciever = receiver;
@@ -51,6 +80,23 @@ public class Data implements Serializable {
         this.subject = subject;
         Text = text;
         this.file = file;
+    }
+
+
+    public String getSendingFileName() {
+        return SendingFileName;
+    }
+
+    public void setSendingFileName(String sendingFileName) {
+        SendingFileName = sendingFileName;
+    }
+
+    public byte[] getSendingFile() {
+        return SendingFile;
+    }
+
+    public void setSendingFile(byte[] sendingFile) {
+        SendingFile = sendingFile;
     }
 
     public MessageType getMessageType() {
@@ -119,14 +165,25 @@ public class Data implements Serializable {
                 '}';
     }
 
+    public String getTime() {
+        return time;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
+    }
+
     @Override
     public boolean equals(Object o) {
-//        if (this == o) return true;
-//        if (o == null || getClass() != o.getClass()) return false;
-        Data data = (Data) o;
-        if( data.getSender().equals(sender))
-            return true;
-        return false;
+        if (o == null)
+            return false;
+
+        if (!(o instanceof Message))
+            return false;
+
+        Data message = (Data) o;
+
+        return message.getSender().equals(this.getSender()) && message.getReciever().equals(this.getReciever()) && message.getText().equals(this.getText()) && message.getSubject().equals(this.getSubject());
 
     }
 
