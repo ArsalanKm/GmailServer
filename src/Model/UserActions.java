@@ -21,4 +21,5 @@ public enum UserActions {
     Change_Setting,
     Message,
     Log_Out,
+    Refresh,
 }

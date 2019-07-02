@@ -34,6 +34,7 @@ public class User implements Serializable {
     private List<Data> inbox = new ArrayList<>();
     private List<Data> DeliveryBox = new ArrayList<>();
     private List<Data> outbox = new ArrayList<>();
+    public List<Data> ConversationsList=new ArrayList<>();
     public User() {
     }
     public User(String name, String lastname, String username, String password, String birthDate) {

@@ -11,50 +11,36 @@ public class Message implements Serializable {
     private String MessageText;
     private UserActions userActions;
     private User user;
-    private List<User> AllUSer=new ArrayList<>();
-    private List<Data> Mydata=new ArrayList<>();
+    private List<User> AllUSer = new ArrayList<>();
+    private List<Data> Mydata = new ArrayList<>();
+    private Data data;
 
-    public Message( List<Data> mydata,UserActions userActions) {
+    public Message(List<Data> mydata, UserActions userActions) {
         this.userActions = userActions;
         Mydata = mydata;
     }
 
-    private Data data;
     public Message(Data data) {
-        this.data=data;
-    }
-
-    public Message(Data mailbox, UserActions message) {
-        this.data=mailbox;
-        this.userActions=message;
-    }
-
-
-
-
-    public Data getData() {
-        return data;
-    }
-
-    public void setData(Data data) {
         this.data = data;
     }
 
-
-
-    public List<User> getAllUSer() {
-        return AllUSer;
+    public Message(Data mailbox, UserActions message) {
+        this.data = mailbox;
+        this.userActions = message;
     }
 
-    public void setAllUSer(List<User> allUSer) {
-        AllUSer = allUSer;
+    public List<Data> ConversationsList=new ArrayList<>();
+    public Message(UserActions refresh, List<Data> inbox,List<Data> ConversationsList) {
+        this.userActions = refresh;
+        this.Mydata = inbox;
+        this.ConversationsList=ConversationsList;
     }
 
     public Message(String sender, String reciever, String messageText, User user) {
         Sender = sender;
         this.reciever = reciever;
         MessageText = messageText;
-        this.user=user;
+        this.user = user;
     }
 
     public Message(String sender, String reciever, String messageText, UserActions userActions) {
@@ -63,6 +49,7 @@ public class Message implements Serializable {
         MessageText = messageText;
         this.setUserActions(userActions);
     }
+
 
     public Message(String sender, String reciever, String messageText, UserActions userActions, List<User> allUSer) {
         Sender = sender;
@@ -87,6 +74,21 @@ public class Message implements Serializable {
         this.user = user;
     }
 
+    public Data getData() {
+        return data;
+    }
+
+    public void setData(Data data) {
+        this.data = data;
+    }
+
+    public List<User> getAllUSer() {
+        return AllUSer;
+    }
+
+    public void setAllUSer(List<User> allUSer) {
+        AllUSer = allUSer;
+    }
 
     public String getSender() {
         return Sender;

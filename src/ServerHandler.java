@@ -189,6 +189,14 @@ public class ServerHandler {
                 System.out.println("Online users size in logout side  : " + OnlineUsers.ONLINE_USERS.size());
 
             }
+            case Refresh:{
+                for (User user:RegisteredUsers) {
+                    if(user.equals(message.getUser())){
+                        outputStream.writeObject(new Message (UserActions.Refresh, user.Inbox,user.ConversationsList));
+                   outputStream.flush();
+                    }
+                }
+            }
         }
     }
 
@@ -224,13 +232,22 @@ public class ServerHandler {
 
             BufferedImage image = ImageIO.read(new File("C:\\Users\\asus\\Desktop\\Server\\src\\Recources\\UserIcon.png"));
             ByteArrayOutputStream outputStream1 = new ByteArrayOutputStream();
-            ImageIO.write(image, "png", outputStream);
+            ImageIO.write(image, "png", outputStream1);
             byte[] bufferedImage = outputStream1.toByteArray();
             DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+
             LocalDateTime now = LocalDateTime.now();
             Data data = new Data("mailerdaemon@googlemail.com", message.getData().getSender(), "Mail Delivery Subsystem", "your target account doesnt exit dear", dtf.format(now), bufferedImage);
-            Sender.getUser().getOutputStream().writeObject(new Message(data, UserActions.Message));
-            outputStream.flush();
+            for (User user : RegisteredUsers) {
+                if (user.getUsername().equals(message.getData().getSender())) {
+                    user.Inbox.add(data);
+                    user.ConversationsList.add(data);
+
+                }
+
+            }
+
+
             mailboxes.remove(message.getData());
             System.out.println("Message sent from mail delivery system . ");
             System.out.println("Mail box size : " + mailboxes.size());
@@ -244,12 +261,13 @@ public class ServerHandler {
             for (User user : RegisteredUsers) {
                 if (user.getUsername().equals(message.getData().getReciever())) {
                     user.Inbox.add(message.getData());
+                    user.ConversationsList.add(message.getData());
                 }
 
-                   }
+            }
 
-//            MailBox.remove(message.getData());
-//            System.out.println("recieve is online : mail box size: " + mailboxes.size());
+            MailBox.remove(message.getData());
+            System.out.println("recieve is online : mail box size: " + mailboxes.size());
         }
 
         // keep the message in mail box till the user become online  .
@@ -259,11 +277,13 @@ public class ServerHandler {
             for (User user : RegisteredUsers) {
                 if (user.getUsername().equals(message.getData().getReciever())) {
                     user.Inbox.add(message.getData());
+                    user.ConversationsList.add(message.getData());
                 }
 
             }
-            for (User user:RegisteredUsers) {
+            for (User user : RegisteredUsers) {
                 System.out.println(user.Inbox.size());
+                System.out.println("Registerd user Conversation size :  1" + user.ConversationsList.size());
 
             }
             System.out.println("User is not online and server will keep the message till user become online . ");

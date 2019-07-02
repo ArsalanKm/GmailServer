@@ -22,6 +22,23 @@ public class Data implements Serializable {
     private String time;
     private boolean isfavorite=false;
     private boolean isSenn=false;
+    public boolean isInTheConvesationList() {
+        return inTheConvesationList;
+    }
+
+    public void setInTheConvesationList(boolean inTheConvesationList) {
+        this.inTheConvesationList = inTheConvesationList;
+    }
+    private String SendingFileUrl;
+
+    public String getSendingFileUrl() {
+        return SendingFileUrl;
+    }
+
+    public void setSendingFileUrl(String sendingFileUrll) {
+        SendingFileUrl = sendingFileUrll;
+    }
+    private boolean inTheConvesationList=false;
 
     public boolean isIsfavorite() {
         return isfavorite;
