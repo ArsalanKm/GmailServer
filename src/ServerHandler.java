@@ -147,7 +147,7 @@ public class ServerHandler {
                     }
                 }
 
-
+                break;
             }
             //Change Setting protocole
             case Change_Setting: {
@@ -162,6 +162,7 @@ public class ServerHandler {
                     }
 
                 }
+                break;
             }
             //Chat Protocole
             case Message: {
@@ -187,15 +188,95 @@ public class ServerHandler {
                 semaphore.release();
 
                 System.out.println("Online users size in logout side  : " + OnlineUsers.ONLINE_USERS.size());
+                break;
 
             }
-            case Refresh:{
-                for (User user:RegisteredUsers) {
-                    if(user.equals(message.getUser())){
-                        outputStream.writeObject(new Message (UserActions.Refresh, user.Inbox,user.ConversationsList));
-                   outputStream.flush();
+            case Refresh: {
+                for (User user : RegisteredUsers) {
+                    if (user.equals(message.getUser())) {
+                        System.out.println("Refresh side : " + user.Blocked_Users.size());
+                        outputStream.writeObject(new Message(UserActions.Refresh, user.Inbox, user.ConversationsList, user.Blocked_Users,user.Outbox));
+                        outputStream.flush();
                     }
                 }
+                break;
+            }
+            case Block: {
+                User TempUser = null;
+                for (User user : RegisteredUsers) {
+
+                    if (user.getUsername().equals(message.getSender())) {
+                        user.setBlock(true);
+                        System.out.println(message.getUser().getUsername() + "  " + "Block" + message.getSender());
+                        message.getUser().getBlocked_Users().add(user);
+                        TempUser = user;
+                    }
+                }
+                for (User user : RegisteredUsers) {
+                    if (user.getUsername().equals(message.getUser().getUsername())) {
+                        user.Blocked_Users.add(TempUser);
+                    }
+                    System.out.println(user.Blocked_Users.size());
+                }
+                for (User user : RegisteredUsers) {
+                    for (Data data : user.Inbox) {
+                        if (data.getSender().equals(message.getSender())) {
+                            data.SenderIsBlocked = true;
+                            System.out.println("data sender : " + data.getSender());
+                        }
+                    }
+                }
+
+                break;
+            }
+            case UnBlock: {
+                List<User> UnbLockList = new ArrayList<>();
+                for (User user : RegisteredUsers) {
+                    if (user.getUsername().equals(message.getUser().getUsername())) {
+                        for (User Blocked : user.Blocked_Users) {
+                            if (Blocked.getUsername().equals(message.getSender())) {
+//                                user.Blocked_Users.remove(Blocked);
+                                Blocked.setBlock(false);
+                                UnbLockList.add(Blocked);
+                                System.out.println(user.getUsername() + "  UnBlocked  " + Blocked.getUsername());
+                                DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+                                LocalDateTime now = LocalDateTime.now();
+                                System.out.println(dtf.format(now));
+
+                            }
+                        }
+                        user.Blocked_Users.removeAll(UnbLockList);
+                    }
+                }
+                for (User user : RegisteredUsers) {
+                    if (user.getUsername().equals(message.getUser().getUsername())) {
+                        for (Data data : user.Inbox) {
+                            if (data.getSender().equals(message.getSender())) {
+                                data.SenderIsBlocked = false;
+                            }
+                        }
+                    }
+                }
+                break;
+            }
+            case RemoveMsg: {
+                List<Data> Want_Remove=new ArrayList<>();
+                for (User user : RegisteredUsers) {
+                    if (user.getUsername().equals(message.getUser().getUsername())) {
+                        for (Data data : user.Inbox) {
+                            if (data.equals(message.getData())) {
+                                System.out.println("In the if condition");
+                                Want_Remove.add(data);
+                            }
+
+                        }
+                        user.Inbox.removeAll(Want_Remove);
+                        user.Blocked_Users.removeAll(Want_Remove);
+                        user.ConversationsList.removeAll(Want_Remove);
+                    }
+
+                }
+                break;
             }
         }
     }
@@ -262,8 +343,17 @@ public class ServerHandler {
                 if (user.getUsername().equals(message.getData().getReciever())) {
                     user.Inbox.add(message.getData());
                     user.ConversationsList.add(message.getData());
+
+                }
+                if (user.getUsername().equals(message.getData().getSender())) {
+                    user.ConversationsList.add(message.getData());
                 }
 
+            }
+            for(User user: RegisteredUsers){
+                if(user.getUsername().equals(message.getData().getSender())){
+                    user.Outbox.add(message.getData());
+                }
             }
 
             MailBox.remove(message.getData());
@@ -279,7 +369,15 @@ public class ServerHandler {
                     user.Inbox.add(message.getData());
                     user.ConversationsList.add(message.getData());
                 }
+                if (user.getUsername().equals(message.getData().getSender())) {
+                    user.ConversationsList.add(message.getData());
+                }
 
+            }
+            for(User user: RegisteredUsers){
+                if(user.getUsername().equals(message.getData().getSender())){
+                    user.Outbox.add(message.getData());
+                }
             }
             for (User user : RegisteredUsers) {
                 System.out.println(user.Inbox.size());

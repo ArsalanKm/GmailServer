@@ -1,11 +1,13 @@
 package Model;
 
+import javax.print.attribute.DocAttribute;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Message implements Serializable {
     static final long serialVersionUID = 42L;
+    public List<Data> ConversationsList = new ArrayList<>();
     private String Sender;
     private String reciever;
     private String MessageText;
@@ -14,6 +16,12 @@ public class Message implements Serializable {
     private List<User> AllUSer = new ArrayList<>();
     private List<Data> Mydata = new ArrayList<>();
     private Data data;
+    private List<User> Blocked_User = new ArrayList<>();
+public List<Data> OUTBOX=new ArrayList<>();
+    public Message(User user, Data data) {
+        this.user = user;
+        this.data = data;
+    }
 
     public Message(List<Data> mydata, UserActions userActions) {
         this.userActions = userActions;
@@ -29,11 +37,12 @@ public class Message implements Serializable {
         this.userActions = message;
     }
 
-    public List<Data> ConversationsList=new ArrayList<>();
-    public Message(UserActions refresh, List<Data> inbox,List<Data> ConversationsList) {
+    public Message(UserActions refresh, List<Data> inbox, List<Data> ConversationsList, List<User> Blocked_Users,List<Data> outbox) {
         this.userActions = refresh;
         this.Mydata = inbox;
-        this.ConversationsList=ConversationsList;
+        this.ConversationsList = ConversationsList;
+        this.Blocked_User = Blocked_Users;
+        this.OUTBOX=outbox;
     }
 
     public Message(String sender, String reciever, String messageText, User user) {
@@ -50,7 +59,6 @@ public class Message implements Serializable {
         this.setUserActions(userActions);
     }
 
-
     public Message(String sender, String reciever, String messageText, UserActions userActions, List<User> allUSer) {
         Sender = sender;
         this.reciever = reciever;
@@ -66,12 +74,21 @@ public class Message implements Serializable {
         this.data = data;
     }
 
+
     public Message(String sender, String reciever, String messageText, UserActions userActions, User user) {
         Sender = sender;
         this.reciever = reciever;
         MessageText = messageText;
         this.userActions = userActions;
         this.user = user;
+    }
+
+    public List<User> getBlocked_User() {
+        return Blocked_User;
+    }
+
+    public void setBlocked_User(List<User> blocked_User) {
+        Blocked_User = blocked_User;
     }
 
     public Data getData() {

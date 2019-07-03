@@ -103,7 +103,7 @@ public class Data implements Serializable {
     public String getSendingFileName() {
         return SendingFileName;
     }
-
+    public boolean SenderIsBlocked=false;
     public void setSendingFileName(String sendingFileName) {
         SendingFileName = sendingFileName;
     }
@@ -195,8 +195,7 @@ public class Data implements Serializable {
         if (o == null)
             return false;
 
-        if (!(o instanceof Message))
-            return false;
+
 
         Data message = (Data) o;
 

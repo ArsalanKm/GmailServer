@@ -10,13 +10,15 @@ import java.util.List;
 
 public class User implements Serializable {
     // 7589968655528222888
-    public static final long serialVersionUID = 7589968655528222888L;
+    public static final long serialVersionUID = 12;
     public static List<User> GmailUsers = new ArrayList<>();
     public static List<User> RegisterdUser = new ArrayList<>();
-    public  List<Data> Inbox = new ArrayList<>();
-    public  List<Data> Outbox = new ArrayList<>();
-    public List<Data> FavoritesBox=new ArrayList<>();
+    public static List<User> xx = new ArrayList<>();
+    public List<Data> Inbox = new ArrayList<>();
+    public List<Data> Outbox = new ArrayList<>();
     public byte[] UserImageFile = new byte[1024];
+    public List<Data> ConversationsList = new ArrayList<>();
+    public List<Data> FavoritesBox = new ArrayList<>();
     private String ImageUrl = "C:\\Users\\asus\\Desktop\\GmailMainProject\\src\\Recources\\";
     private String name;
     private String Lastname;
@@ -34,9 +36,20 @@ public class User implements Serializable {
     private List<Data> inbox = new ArrayList<>();
     private List<Data> DeliveryBox = new ArrayList<>();
     private List<Data> outbox = new ArrayList<>();
-    public List<Data> ConversationsList=new ArrayList<>();
+    public List<User> Blocked_Users = new ArrayList<>();
+    private boolean IsBlock=false;
+
+    public boolean isBlock() {
+        return IsBlock;
+    }
+
+    public void setBlock(boolean block) {
+        IsBlock = block;
+    }
+
     public User() {
     }
+
     public User(String name, String lastname, String username, String password, String birthDate) {
         this.name = name;
         Lastname = lastname;
@@ -60,6 +73,18 @@ public class User implements Serializable {
 
     public static List<User> getGmailUsers() {
         return GmailUsers;
+    }
+
+    public List<User> getBlocked_Users() {
+        return Blocked_Users;
+    }
+
+    public void setBlocked_Users(List<User> blocked_Users) {
+        Blocked_Users = blocked_Users;
+    }
+
+    public List<Data> getFavoritesBox() {
+        return FavoritesBox;
     }
 
     public byte[] getUserImageFile() {
@@ -209,6 +234,10 @@ public class User implements Serializable {
 
     @Override
     public boolean equals(Object o) {
+        if (o == null)
+            return false;
+
+
         User user = (User) o;
         return this.getPassword().equals(user.getPassword()) && user.getUsername().equals(this.getUsername());
 

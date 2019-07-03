@@ -1,4 +1,6 @@
 import Model.Message;
+
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -20,6 +22,7 @@ public class Server implements Runnable {
         Thread serverThread = new Thread(new Server(), "ServerThread");
         serverThread.start();
     }
+
     @Override
     public void run() {
         while (!requestServerSocket.isClosed()) {
@@ -52,6 +55,8 @@ class ServerRunner implements Runnable {
                 message = (Message) serverHandler.getInputStream().readObject();
                 serverHandler.handle(message);
             }
+//            }
+        } catch (EOFException e) {
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
