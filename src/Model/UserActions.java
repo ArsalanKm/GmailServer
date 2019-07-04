@@ -22,4 +22,7 @@ public enum UserActions {
     Message,
     Log_Out,
     Refresh,
+    ReplyMessage,
+    Add_Favorite, DeleteFavoite,
+
 }

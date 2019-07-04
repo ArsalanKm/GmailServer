@@ -115,7 +115,29 @@ public class ServerHandler {
                 break;
 
             }
-            //porotocol that checking occurences of users
+            //showing forwarded messages information
+            case Forward: {
+                System.out.println(message.getUser().getUsername() + "  forward");
+                System.out.println("message:  " + message.getData().getSubject() + "  " + message.getData().getSendingFileName() + " from" + message.getData().getSender() + " TO" + message.getData().getReciever());
+                DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+                LocalDateTime now = LocalDateTime.now();
+                System.out.println(dtf.format(now));
+                break;
+
+            }
+            //showing Replied messages informations
+            case ReplyMessage: {
+                System.out.println(message.getUser().getUsername() + "  Reply");
+                System.out.println("message: " + message.getData().getSubject() + "  " + message.getData().getSendingFileName() + "  to " + message.getData().getReciever());
+
+                DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+
+                LocalDateTime now = LocalDateTime.now();
+                System.out.println(dtf.format(now));
+
+                break;
+            }
+            //Sending Registration list to client side to check new Logged in users
             case Reply: {
                 outputStream.writeObject(new Message("", "", "", UserActions.Reply, RegisteredUsers));
                 outputStream.flush();
@@ -153,8 +175,15 @@ public class ServerHandler {
             case Change_Setting: {
                 for (User user : RegisteredUsers) {
                     if (user.getUsername().equals(message.getUser().getUsername())) {
-                        user = message.getUser();
-                        ByteArrayInputStream bis = new ByteArrayInputStream(message.getUser().UserImageFile);
+                        user.setName(message.getNewuser().getName());
+                        user.setLastname(message.getNewuser().getLastname());
+                        user.setPassword(message.getNewuser().getPassword());
+                        user.setUserImageFile(message.getNewuser().getUserImageFile());
+                        user.setImageUrl(message.getNewuser().getImageUrl());
+                        System.out.println("New User name :      "+user.getName());
+                        outputStream.writeObject(new Message(user, UserActions.Change_Setting));
+                        outputStream.flush();
+                        ByteArrayInputStream bis = new ByteArrayInputStream(message.getNewuser().UserImageFile);
                         BufferedImage bImage2 = ImageIO.read(bis);
                         ImageIO.write(bImage2, "png", new File(IMAGES_DIRECTORY + "New_Image" + message.getUser().getName()));
                         System.out.println("image created");
@@ -164,7 +193,7 @@ public class ServerHandler {
                 }
                 break;
             }
-            //Chat Protocole
+            //chat things
             case Message: {
                 message(message, outputStream);
                 break;
@@ -191,23 +220,25 @@ public class ServerHandler {
                 break;
 
             }
+            //Refresh Btm that send 4 users List to them and refresh them
             case Refresh: {
                 for (User user : RegisteredUsers) {
                     if (user.equals(message.getUser())) {
                         System.out.println("Refresh side : " + user.Blocked_Users.size());
-                        outputStream.writeObject(new Message(UserActions.Refresh, user.Inbox, user.ConversationsList, user.Blocked_Users,user.Outbox));
+                        outputStream.writeObject(new Message(UserActions.Refresh, user.Inbox, user.ConversationsList, user.Blocked_Users, user.Outbox,user.FavoritesBox));
                         outputStream.flush();
                     }
                 }
                 break;
             }
             case Block: {
+                System.out.println(" is in fucking block case");
                 User TempUser = null;
                 for (User user : RegisteredUsers) {
 
-                    if (user.getUsername().equals(message.getSender())) {
+                    if (user.getUsername().equals(message.getData().getSender())) {
                         user.setBlock(true);
-                        System.out.println(message.getUser().getUsername() + "  " + "Block" + message.getSender());
+                        System.out.println(message.getUser().getUsername() + "  " + "Block" + message.getData().getSender());
                         message.getUser().getBlocked_Users().add(user);
                         TempUser = user;
                     }
@@ -220,7 +251,7 @@ public class ServerHandler {
                 }
                 for (User user : RegisteredUsers) {
                     for (Data data : user.Inbox) {
-                        if (data.getSender().equals(message.getSender())) {
+                        if (data.getSender().equals(message.getData().getSender())) {
                             data.SenderIsBlocked = true;
                             System.out.println("data sender : " + data.getSender());
                         }
@@ -229,12 +260,15 @@ public class ServerHandler {
 
                 break;
             }
+            //UnBlocking Users
             case UnBlock: {
+                User TempUser = null;
                 List<User> UnbLockList = new ArrayList<>();
                 for (User user : RegisteredUsers) {
                     if (user.getUsername().equals(message.getUser().getUsername())) {
                         for (User Blocked : user.Blocked_Users) {
                             if (Blocked.getUsername().equals(message.getSender())) {
+                                TempUser = Blocked;
 //                                user.Blocked_Users.remove(Blocked);
                                 Blocked.setBlock(false);
                                 UnbLockList.add(Blocked);
@@ -247,6 +281,7 @@ public class ServerHandler {
                         }
                         user.Blocked_Users.removeAll(UnbLockList);
                     }
+
                 }
                 for (User user : RegisteredUsers) {
                     if (user.getUsername().equals(message.getUser().getUsername())) {
@@ -259,8 +294,27 @@ public class ServerHandler {
                 }
                 break;
             }
+            case DeleteFavoite: {
+                for(User user:RegisteredUsers)
+                {
+                    if(user.getUsername().equals(message.getUser().getUsername())){
+                        user.FavoritesBox.remove(message.getData());
+                    }
+                }
+                break;
+            }
+            case Add_Favorite:{
+                for (User user:RegisteredUsers) {
+                   if(user.getUsername().equals(message.getUser().getUsername()))
+                   {
+                       user.FavoritesBox.add(message.getData());
+                   }
+                }
+                break;
+            }
+            //Removing Message
             case RemoveMsg: {
-                List<Data> Want_Remove=new ArrayList<>();
+                List<Data> Want_Remove = new ArrayList<>();
                 for (User user : RegisteredUsers) {
                     if (user.getUsername().equals(message.getUser().getUsername())) {
                         for (Data data : user.Inbox) {
@@ -276,6 +330,39 @@ public class ServerHandler {
                     }
 
                 }
+                break;
+            }
+            case RemoveConv: {
+                String reciever = "";
+                List<Data> DeletFormSentMessages = new ArrayList<>();
+                List<Data> DeletFormtInboxMessages = new ArrayList<>();
+                for (Data data : message.getUser().wantToDeletConversation) {
+
+                    for (Data sent : message.getUser().Outbox) {
+                        if (sent.getReciever().equals(data.getReciever())) {
+                            DeletFormSentMessages.add(sent);
+                            reciever = data.getReciever();
+                        }
+                    }
+                    for (Data inbox : message.getUser().Inbox) {
+                        if (inbox.getSender().equals(data.getSender())) {
+                            DeletFormtInboxMessages.add(inbox);
+                            reciever = data.getSender();
+                        }
+                    }
+
+                }
+                for (User user : RegisteredUsers) {
+                    if (message.getUser().getUsername().equals(user.getUsername())) {
+                        user.Inbox.removeAll(DeletFormtInboxMessages);
+                        user.Outbox.removeAll(DeletFormSentMessages);
+                        user.ConversationsList.removeAll(message.getUser().wantToDeletConversation);
+                    }
+                }
+                System.out.println(message.getUser().getUsername() + " DeleteConversation   " + reciever);
+                DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+                LocalDateTime now = LocalDateTime.now();
+                System.out.println(dtf.format(now));
                 break;
             }
         }
@@ -323,6 +410,10 @@ public class ServerHandler {
                 if (user.getUsername().equals(message.getData().getSender())) {
                     user.Inbox.add(data);
                     user.ConversationsList.add(data);
+                    System.out.println(user.getUsername() + "  " + "recieve");
+                    System.out.println("message:  " + data.getSubject() + data.getSendingFileName());
+                    System.out.println(dtf.format(now));
+
 
                 }
 
@@ -343,6 +434,12 @@ public class ServerHandler {
                 if (user.getUsername().equals(message.getData().getReciever())) {
                     user.Inbox.add(message.getData());
                     user.ConversationsList.add(message.getData());
+                    System.out.println(user.getUsername() + "  " + "recieve");
+                    System.out.println("message:  " + message.getData().getSubject() + message.getData().getSendingFileName());
+                    DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+
+                    LocalDateTime now = LocalDateTime.now();
+                    System.out.println(dtf.format(now));
 
                 }
                 if (user.getUsername().equals(message.getData().getSender())) {
@@ -350,8 +447,8 @@ public class ServerHandler {
                 }
 
             }
-            for(User user: RegisteredUsers){
-                if(user.getUsername().equals(message.getData().getSender())){
+            for (User user : RegisteredUsers) {
+                if (user.getUsername().equals(message.getData().getSender())) {
                     user.Outbox.add(message.getData());
                 }
             }
@@ -368,20 +465,34 @@ public class ServerHandler {
                 if (user.getUsername().equals(message.getData().getReciever())) {
                     user.Inbox.add(message.getData());
                     user.ConversationsList.add(message.getData());
+                    System.out.println(user.getUsername() + "  " + "recieve");
+                    System.out.println("message:  " + message.getData().getSubject() + message.getData().getSendingFileName());
+                    DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+
+                    LocalDateTime now = LocalDateTime.now();
+                    System.out.println(dtf.format(now));
+
                 }
                 if (user.getUsername().equals(message.getData().getSender())) {
                     user.ConversationsList.add(message.getData());
                 }
 
             }
-            for(User user: RegisteredUsers){
-                if(user.getUsername().equals(message.getData().getSender())){
+            for (User user : RegisteredUsers) {
+                if (user.getUsername().equals(message.getData().getSender())) {
+                    System.out.println(user.getUsername() + "  " + "send");
+                    System.out.println("message:  " + message.getData().getSubject() + "   " + message.getData().getSendingFileName() + " to " + message.getData().getReciever());
+                    DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+
+                    LocalDateTime now = LocalDateTime.now();
+                    System.out.println(dtf.format(now));
+
                     user.Outbox.add(message.getData());
                 }
             }
             for (User user : RegisteredUsers) {
-                System.out.println(user.Inbox.size());
-                System.out.println("Registerd user Conversation size :  1" + user.ConversationsList.size());
+                System.out.println("Registerd users Inbox size  : " + user.Inbox.size());
+                System.out.println("Registerd user Conversation size :  " + user.ConversationsList.size());
 
             }
             System.out.println("User is not online and server will keep the message till user become online . ");

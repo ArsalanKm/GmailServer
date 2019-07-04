@@ -1,6 +1,5 @@
 package Model;
 
-import javax.print.attribute.DocAttribute;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,6 +7,10 @@ import java.util.List;
 public class Message implements Serializable {
     static final long serialVersionUID = 42L;
     public List<Data> ConversationsList = new ArrayList<>();
+    public List<Data> OUTBOX = new ArrayList<>();
+    public List<Data> ListOfConversation = new ArrayList<>();
+    public List<Data> FavoritBox=new ArrayList<>();
+    private User newuser = new User();
     private String Sender;
     private String reciever;
     private String MessageText;
@@ -17,11 +20,24 @@ public class Message implements Serializable {
     private List<Data> Mydata = new ArrayList<>();
     private Data data;
     private List<User> Blocked_User = new ArrayList<>();
-public List<Data> OUTBOX=new ArrayList<>();
+
     public Message(User user, Data data) {
         this.user = user;
         this.data = data;
     }
+
+    public Message(User user, Data data, UserActions userActions) {
+        this.user = user;
+        this.data = data;
+        this.userActions = userActions;
+    }
+
+    public Message(User user, List<Data> chatList, UserActions userActions) {
+        this.ListOfConversation = chatList;
+        this.user = user;
+        this.userActions = userActions;
+    }
+
 
     public Message(List<Data> mydata, UserActions userActions) {
         this.userActions = userActions;
@@ -37,12 +53,13 @@ public List<Data> OUTBOX=new ArrayList<>();
         this.userActions = message;
     }
 
-    public Message(UserActions refresh, List<Data> inbox, List<Data> ConversationsList, List<User> Blocked_Users,List<Data> outbox) {
+    public Message(UserActions refresh, List<Data> inbox, List<Data> ConversationsList, List<User> Blocked_Users, List<Data> outbox,List<Data> FAvoriteBox) {
         this.userActions = refresh;
         this.Mydata = inbox;
         this.ConversationsList = ConversationsList;
         this.Blocked_User = Blocked_Users;
-        this.OUTBOX=outbox;
+        this.OUTBOX = outbox;
+        this.FavoritBox=FAvoriteBox;
     }
 
     public Message(String sender, String reciever, String messageText, User user) {
@@ -81,6 +98,24 @@ public List<Data> OUTBOX=new ArrayList<>();
         MessageText = messageText;
         this.userActions = userActions;
         this.user = user;
+    }
+
+    public User getNewuser() {
+        return newuser;
+    }
+
+    public void setNewuser(User newuser) {
+        this.newuser = newuser;
+    }
+    public Message(User user, UserActions userActions){
+        this.user=user;
+        this.userActions=userActions;
+    }
+
+    public Message(User user, User newuser, UserActions change_setting) {
+        this.user = user;
+        this.userActions = change_setting;
+        this.newuser = newuser;
     }
 
     public List<User> getBlocked_User() {

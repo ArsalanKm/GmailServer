@@ -37,6 +37,7 @@ public class User implements Serializable {
     private List<Data> DeliveryBox = new ArrayList<>();
     private List<Data> outbox = new ArrayList<>();
     public List<User> Blocked_Users = new ArrayList<>();
+    public List<Data> wantToDeletConversation=new ArrayList<>();
     private boolean IsBlock=false;
 
     public boolean isBlock() {
