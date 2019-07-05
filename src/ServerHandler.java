@@ -173,22 +173,7 @@ public class ServerHandler {
                 BufferedImage bImage2 = ImageIO.read(bis);
                 ImageIO.write(bImage2, "png", new File(SERVER_DBROOT + directoryPath + "\\" + directoryPath + ".png"));
 
-//                for (Data mailbox : mailboxes) {
-//                for(int i=mailboxes.size()-1;i>=0;i--){
-//                    if (mailboxes.get(i).getReciever().equals(message.getUser().getUsername())) {
-//                        System.out.println("Reciever become online");
-//                        LoggedUser.getUser().getOutputStream().writeObject(new Message(mailboxes.get(i), UserActions.Message));
-//                       MessagesList.add(mailboxes.get(i));
-//                        System.out.println("MAil Sender: " + mailboxes.get(i).getSender());
-//                        System.out.println("Mail Reciever: " + mailboxes.get(i).getReciever());
-//                        System.out.println("Mail Texr: " + mailboxes.get(i).getText());
-//                        System.out.println("Message sent to user");
-//                        MailBox.remove(mailboxes.get(i));
-//
-//                    }
-//                }
-//
-//                mailboxes.removeAll(MessagesList);
+             mailboxes.removeAll(MessagesList);
 
 
                 break;
@@ -199,11 +184,7 @@ public class ServerHandler {
              * Forward API : Server Handle this situation when a message forwarded to another user
              */
             case Forward: {
-//                System.out.println(message.getUser().getUsername() + "  forward");
-//                System.out.println("message:  " + message.getData().getSubject() + "  " + message.getData().getSendingFileName() + " from" + message.getData().getSender() + " TO" + message.getData().getReciever());
-//                DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
-//                LocalDateTime now = LocalDateTime.now();
-//                System.out.println(dtf.format(now));
+
                 Forward(message);
                 break;
 
@@ -213,14 +194,7 @@ public class ServerHandler {
              * ReplyMessage that Server Handle this situation when Messages Reply
              */
             case ReplyMessage: {
-//                System.out.println(message.getUser().getUsername() + "  Reply");
-//                System.out.println("message: " + message.getData().getSubject() + "  " + message.getData().getSendingFileName() + "  to " + message.getData().getReciever());
-//
-//                DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
-//
-//                LocalDateTime now = LocalDateTime.now();
-//                System.out.println(dtf.format(now));
-//
+
                 ReplyMessage(message);
                 break;
             }
@@ -264,22 +238,7 @@ public class ServerHandler {
              * this API update changes in user profile
              */
             case Change_Setting: {
-//                for (User user : RegisteredUsers) {
-//                    if (user.getUsername().equals(message.getUser().getUsername())) {
-//                        user.setName(message.getNewuser().getName());
-//                        user.setLastname(message.getNewuser().getLastname());
-//                        user.setPassword(message.getNewuser().getPassword());
-//                        user.setUserImageFile(message.getNewuser().getUserImageFile());
-//                        user.setImageUrl(message.getNewuser().getImageUrl());
-//
-//                        outputStream.writeObject(new Message(user, UserActions.Change_Setting));
-//                        outputStream.flush();
-//                        ByteArrayInputStream bis = new ByteArrayInputStream(message.getNewuser().UserImageFile);
-//                        BufferedImage bImage2 = ImageIO.read(bis);
-//                        ImageIO.write(bImage2, "png", new File(IMAGES_DIRECTORY + "New_Image" + message.getUser().getName()));
-//
-//                        break;
-//                    }
+
                 ChangeSetting(message);
 
                 break;
@@ -318,12 +277,7 @@ public class ServerHandler {
              * Refresh API that send updated List when refresh Btm selected
              */
             case Refresh: {
-//                for (User user : RegisteredUsers) {
-//                    if (user.equals(message.getUser())) {
-//                        outputStream.writeObject(new Message(UserActions.Refresh, user.Inbox, user.ConversationsList, user.Blocked_Users, user.Outbox, user.FavoritesBox));
-//                        outputStream.flush();
-//                    }
-//                }
+
                 Refresh(message);
                 break;
             }
@@ -334,29 +288,7 @@ public class ServerHandler {
              */
             case Block: {
 
-//                User TempUser = null;
-//                for (User user : RegisteredUsers) {
-//
-//                    if (user.getUsername().equals(message.getData().getSender())) {
-//                        user.setBlock(true);
-//                        System.out.println(message.getUser().getUsername() + "  " + "Block" + message.getData().getSender());
-//                        message.getUser().getBlocked_Users().add(user);
-//                        TempUser = user;
-//                    }
-//                }
-//                for (User user : RegisteredUsers) {
-//                    if (user.getUsername().equals(message.getUser().getUsername())) {
-//                        user.Blocked_Users.add(TempUser);
-//                    }
-//                    System.out.println(user.Blocked_Users.size());
-//                }
-//                for (User user : RegisteredUsers) {
-//                    for (Data data : user.Inbox) {
-//                        if (data.getSender().equals(message.getData().getSender())) {
-//                            data.SenderIsBlocked = true;
-//                        }
-//                    }
-//                }
+
                 Block(message);
                 break;
             }
@@ -365,36 +297,7 @@ public class ServerHandler {
              * API that Unblock block users and return then in users panel
              */
             case UnBlock: {
-//                User TempUser = null;
-//                List<User> UnbLockList = new ArrayList<>();
-//                for (User user : RegisteredUsers) {
-//                    if (user.getUsername().equals(message.getUser().getUsername())) {
-//                        for (User Blocked : user.Blocked_Users) {
-//                            if (Blocked.getUsername().equals(message.getSender())) {
-//                                TempUser = Blocked;
-////                                user.Blocked_Users.remove(Blocked);
-//                                Blocked.setBlock(false);
-//                                UnbLockList.add(Blocked);
-//                                System.out.println(user.getUsername() + "  UnBlocked  " + Blocked.getUsername());
-//                                DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
-//                                LocalDateTime now = LocalDateTime.now();
-//                                System.out.println(dtf.format(now));
-//
-//                            }
-//                        }
-//                        user.Blocked_Users.removeAll(UnbLockList);
-//                    }
-//
-//                }
-//                for (User user : RegisteredUsers) {
-//                    if (user.getUsername().equals(message.getUser().getUsername())) {
-//                        for (Data data : user.Inbox) {
-//                            if (data.getSender().equals(message.getSender())) {
-//                                data.SenderIsBlocked = false;
-//                            }
-//                        }
-//                    }
-//                }
+
                 UnBlock(message);
                 break;
             }
@@ -403,17 +306,7 @@ public class ServerHandler {
              *
              */
             case DeleteFavoite: {
-//                for (User user : RegisteredUsers) {
-//                    if (user.getUsername().equals(message.getUser().getUsername())) {
-//                        user.FavoritesBox.remove(message.getData());
-//                        System.out.println(message.getUser() + " unimportant");
-//                        System.out.println("message : " + message.getData().getSubject() + "  " + message.getData().getSender() + " as  unimportant ");
-//                        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
-//                        LocalDateTime now = LocalDateTime.now();
-//                        System.out.println(dtf.format(now));
 //
-//                    }
-//                }
                 DiFavoite(message);
                 break;
             }
@@ -421,16 +314,7 @@ public class ServerHandler {
              * will add selected message to favorite messages list
              */
             case Add_Favorite: {
-//                for (User user : RegisteredUsers) {
-//                    if (user.getUsername().equals(message.getUser().getUsername())) {
-//                        user.FavoritesBox.add(message.getData());
-//                        System.out.println(message.getUser() + " important");
-//                        System.out.println("message : " + message.getData().getSubject() + "  " + message.getData().getSender() + " as  important ");
-//                        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
-//                        LocalDateTime now = LocalDateTime.now();
-//                        System.out.println(dtf.format(now));
-//                    }
-//                }
+//
                 Add_Favorite(message);
                 break;
             }
@@ -439,21 +323,7 @@ public class ServerHandler {
              * API Remove Each message that selected from users
              */
             case RemoveMsg: {
-//                List<Data> Want_Remove = new ArrayList<>();
-//                for (User user : RegisteredUsers) {
-//                    if (user.getUsername().equals(message.getUser().getUsername())) {
-//                        for (Data data : user.Inbox) {
-//                            if (data.equals(message.getData())) {
-//                                Want_Remove.add(data);
-//                            }
-//
-//                        }
-//                        user.Inbox.removeAll(Want_Remove);
-//                        user.Blocked_Users.removeAll(Want_Remove);
-//                        user.ConversationsList.removeAll(Want_Remove);
-//                    }
-//
-//                }
+
                 RemoveMsg(message);
                 break;
             }
@@ -461,36 +331,7 @@ public class ServerHandler {
              * API that Remove selected conversation
              */
             case RemoveConv: {
-//                String reciever = "";
-//                List<Data> DeletFormSentMessages = new ArrayList<>();
-//                List<Data> DeletFormtInboxMessages = new ArrayList<>();
-//                for (Data data : message.getUser().wantToDeletConversation) {
-//
-//                    for (Data sent : message.getUser().Outbox) {
-//                        if (sent.getReciever().equals(data.getReciever())) {
-//                            DeletFormSentMessages.add(sent);
-//                            reciever = data.getReciever();
-//                        }
-//                    }
-//                    for (Data inbox : message.getUser().Inbox) {
-//                        if (inbox.getSender().equals(data.getSender())) {
-//                            DeletFormtInboxMessages.add(inbox);
-//                            reciever = data.getSender();
-//                        }
-//                    }
-//
-//                }
-//                for (User user : RegisteredUsers) {
-//                    if (message.getUser().getUsername().equals(user.getUsername())) {
-//                        user.Inbox.removeAll(DeletFormtInboxMessages);
-//                        user.Outbox.removeAll(DeletFormSentMessages);
-//                        user.ConversationsList.removeAll(message.getUser().wantToDeletConversation);
-//                    }
-//                }
-//                System.out.println(message.getUser().getUsername() + " DeleteConversation   " + reciever);
-//                DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
-//                LocalDateTime now = LocalDateTime.now();
-//                System.out.println(dtf.format(now));
+
                 RemoveConv(message);
                 break;
             }
@@ -498,11 +339,7 @@ public class ServerHandler {
              * when user Read Messages
              */
             case Read: {
-//                System.out.println(message.getUser() + " Read");
-//                System.out.println("message : " + message.getData().getSubject() + "  " + message.getData().getSender() + " as  Read ");
-//                DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
-//                LocalDateTime now = LocalDateTime.now();
-//                System.out.println(dtf.format(now));
+
                 Read(message);
                 break;
             }
@@ -510,11 +347,7 @@ public class ServerHandler {
              * When in Conversation Panel user make Messages Unseen
              */
             case UnRead: {
-//                System.out.println(message.getUser() + " UnRead");
-//                System.out.println("message : " + message.getData().getSubject() + "  " + message.getData().getSender() + " as  UnRead ");
-//                DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
-//                LocalDateTime now = LocalDateTime.now();
-//                System.out.println(dtf.format(now));
+
                 UnReade(message);
 
                 break;

@@ -125,7 +125,7 @@ public class junit {
 
         assertEquals(2, user1.ConversationsList.size());
         ServerHandler.RegisteredUsers.add(user1);
-        assertEquals(1, ServerHandler.RegisteredUsers.size());
+        ;
 
         Message message = new Message(user1, user1.wantToDeletConversation, UserActions.RemoveConv);
         serverHandler.RemoveConv(message);
