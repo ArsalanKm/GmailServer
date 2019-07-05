@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.concurrent.Semaphore;
 
 import static Model.MailBox.mailboxes;
-
 import static Model.UserActions.Not_Online;
 
 /**
@@ -24,6 +23,7 @@ import static Model.UserActions.Not_Online;
  */
 
 public class ServerHandler {
+    public static final String SERVER_DBROOT = "C:\\Users\\asus\\Desktop\\Server\\src\\Database\\Users.ser";
     /**
      * List of Logged users persons for save them
      */
@@ -32,12 +32,10 @@ public class ServerHandler {
      * List of all Users that registered  to our application
      */
     public static List<User> RegisteredUsers = new ArrayList<>();
-
-
+    public static List<String> USERNAME_LIST = new ArrayList<>();
     private static List<OnlineUsers> onlineUsers = new ArrayList<>();
     private static List<Data> MessagesList = new ArrayList<>();
     private final String IMAGES_DIRECTORY = "C:\\Users\\asus\\Desktop\\Server\\src\\UsersImage\\";
-
     /**
      * Socket and inputStream and outputstream for writing over sockets
      */
@@ -59,7 +57,40 @@ public class ServerHandler {
         this.inputStream = inputStream;
         this.outputStream = outputStream;
     }
-    public ServerHandler(){}
+
+    public ServerHandler() {
+    }
+
+    public static void saveUserData(User user) throws IOException {
+
+
+        int split = user.getUsername().lastIndexOf("@");
+        String directoryPath = user.getUsername().substring(0, split);
+
+
+        FileOutputStream outputStream = new FileOutputStream(new File(SERVER_DBROOT + directoryPath + "\\" + directoryPath + ".ser"));
+        ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
+        objectOutputStream.writeObject(user);
+
+        objectOutputStream.close();
+        outputStream.close();
+
+        System.out.println(user.getUsername() + " Saved in Databse .");
+
+    }
+
+    public static void saveUsernames() throws IOException {
+        synchronized (USERNAME_LIST) {
+            FileOutputStream fileOutputStream = new FileOutputStream(new File("src\\Database\\Username.ser"));
+            ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
+            objectOutputStream.writeObject(USERNAME_LIST);
+
+            fileOutputStream.close();
+            objectOutputStream.close();
+        }
+
+
+    }
 
     /**
      * To set input stream
@@ -92,6 +123,10 @@ public class ServerHandler {
                     RegisteredUsers.add(message.getUser());
 
                 }
+                int split = message.getUser().getUsername().lastIndexOf("@");
+                String directoryPath = message.getUser().getUsername().substring(0, split);
+                new File(SERVER_DBROOT + directoryPath).mkdir();
+
                 Thread.sleep(2000);
                 ByteArrayInputStream bis = new ByteArrayInputStream(message.getUser().UserImageFile);
                 BufferedImage bImage2 = ImageIO.read(bis);
@@ -100,7 +135,7 @@ public class ServerHandler {
                 synchronized (AllUsers.All_REGISTERD_USER) {
                     AllUsers.All_REGISTERD_USER.add(message.getUser());
                 }
-
+                saveUserData(message.getUser());
                 System.out.println(message.getUser().getUsername() + " register" + message.getUser().getImageUrl());
                 System.out.println("time :" + message.getUser().getCurrentTimeAndDate());
                 break;
@@ -113,6 +148,7 @@ public class ServerHandler {
                 synchronized (LoggedInUsers) {
                     LoggedInUsers.add(message.getUser());
                 }
+
                 OnlineUsers LoggedUser = new OnlineUsers(message.getUser(), outputStream, inputStream);
                 LoggedUser.setUsername(message.getUser().getUsername());
                 System.out.println(message.getUser().getUsername() + " " + message.getUser().getUserActions());
@@ -121,6 +157,21 @@ public class ServerHandler {
                 onlineUsers.add(LoggedUser);
                 OnlineUsers.ONLINE_USERS.add(LoggedUser);
 
+                int split = message.getUser().getUsername().lastIndexOf("@");
+                String directoryPath = message.getUser().getUsername().substring(0, split);
+                File file = new File(SERVER_DBROOT + directoryPath);
+                if (!file.exists())
+                    file.mkdir();
+
+                FileOutputStream outputStream = new FileOutputStream(new File(SERVER_DBROOT + directoryPath + "\\" + directoryPath + ".ser"));
+                ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
+                objectOutputStream.writeObject(message.getUser());
+
+                objectOutputStream.close();
+                outputStream.close();
+                ByteArrayInputStream bis = new ByteArrayInputStream(message.getUser().UserImageFile);
+                BufferedImage bImage2 = ImageIO.read(bis);
+                ImageIO.write(bImage2, "png", new File(SERVER_DBROOT + directoryPath + "\\" + directoryPath + ".png"));
 
 //                for (Data mailbox : mailboxes) {
 //                for(int i=mailboxes.size()-1;i>=0;i--){
@@ -242,6 +293,7 @@ public class ServerHandler {
             }
             case Log_Out: {
                 // This semaphore is for controlling the access to the online users list .
+//                saveUserData(message.getUser());
                 Semaphore semaphore = new Semaphore(1);
                 semaphore.acquire();
 
@@ -257,7 +309,7 @@ public class ServerHandler {
                     }
                 }
                 semaphore.release();
-
+                saveUserData(message.getUser());
                 break;
 
             }
@@ -470,11 +522,11 @@ public class ServerHandler {
             /**
              * Archieved Messages
              */
-            case Archieve:{
+            case Archieve: {
                 Archieve(message);
                 break;
             }
-            case Recover:{
+            case Recover: {
                 Recover(message);
                 break;
             }
@@ -618,7 +670,7 @@ public class ServerHandler {
 
     }
 
-    public  void Block(Message message) {
+    public void Block(Message message) {
 
         User TempUser = null;
         for (User user : RegisteredUsers) {
@@ -646,7 +698,7 @@ public class ServerHandler {
 
     }
 
-    public  void UnBlock(Message message) {
+    public void UnBlock(Message message) {
         User TempUser = null;
         List<User> UnbLockList = new ArrayList<>();
         for (User user : RegisteredUsers) {
@@ -666,7 +718,8 @@ public class ServerHandler {
                             System.out.println(dtf.format(now));
 
                         }
-                    }catch (NullPointerException ex){ }
+                    } catch (NullPointerException ex) {
+                    }
                 }
                 user.Blocked_Users.removeAll(UnbLockList);
             }
@@ -683,7 +736,7 @@ public class ServerHandler {
         }
     }
 
-    public  void Refresh(Message message) throws IOException {
+    public void Refresh(Message message) throws IOException {
         for (User user : RegisteredUsers) {
             if (user.equals(message.getUser())) {
                 outputStream.writeObject(new Message(UserActions.Refresh, user.Inbox, user.ConversationsList, user.Blocked_Users, user.Outbox, user.FavoritesBox));
@@ -693,7 +746,7 @@ public class ServerHandler {
 
     }
 
-    public  void ChangeSetting(Message message) throws IOException {
+    public void ChangeSetting(Message message) throws IOException {
         for (User user : RegisteredUsers) {
             if (user.getUsername().equals(message.getUser().getUsername())) {
                 user.setName(message.getNewuser().getName());
@@ -701,14 +754,14 @@ public class ServerHandler {
                 user.setPassword(message.getNewuser().getPassword());
                 user.setUserImageFile(message.getNewuser().getUserImageFile());
                 user.setImageUrl(message.getNewuser().getImageUrl());
-try {
+                try {
 
 
-    outputStream.writeObject(new Message(user, UserActions.Change_Setting));
-    outputStream.flush();
-}catch (NullPointerException e){
+                    outputStream.writeObject(new Message(user, UserActions.Change_Setting));
+                    outputStream.flush();
+                } catch (NullPointerException e) {
 
-}
+                }
                 ByteArrayInputStream bis = new ByteArrayInputStream(message.getNewuser().UserImageFile);
                 BufferedImage bImage2 = ImageIO.read(bis);
                 ImageIO.write(bImage2, "png", new File(IMAGES_DIRECTORY + "New_Image" + message.getUser().getName()));
@@ -718,7 +771,8 @@ try {
 
         }
     }
-    public void ReplyMessage(Message message ){
+
+    public void ReplyMessage(Message message) {
         System.out.println(message.getUser().getUsername() + "  Reply");
         System.out.println("message: " + message.getData().getSubject() + "  " + message.getData().getSendingFileName() + "  to " + message.getData().getSender());
 
@@ -727,14 +781,16 @@ try {
         LocalDateTime now = LocalDateTime.now();
         System.out.println(dtf.format(now));
     }
-    public void Forward (Message message){
+
+    public void Forward(Message message) {
         System.out.println(message.getUser().getUsername() + "  forward");
         System.out.println("message:  " + message.getData().getSubject() + "  " + message.getData().getSendingFileName() + " from" + message.getData().getReciever() + " TO" + message.getData().getReciever());
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
         LocalDateTime now = LocalDateTime.now();
         System.out.println(dtf.format(now));
     }
-    public void DiFavoite(Message message){
+
+    public void DiFavoite(Message message) {
         for (User user : RegisteredUsers) {
             if (user.getUsername().equals(message.getUser().getUsername())) {
                 user.FavoritesBox.remove(message.getData());
@@ -747,7 +803,8 @@ try {
             }
         }
     }
-    public void Add_Favorite(Message message){
+
+    public void Add_Favorite(Message message) {
         for (User user : RegisteredUsers) {
             if (user.getUsername().equals(message.getUser().getUsername())) {
                 user.FavoritesBox.add(message.getData());
@@ -759,7 +816,8 @@ try {
             }
         }
     }
-    public  void RemoveMsg(Message message){
+
+    public void RemoveMsg(Message message) {
         List<Data> Want_Remove = new ArrayList<>();
         for (User user : RegisteredUsers) {
             if (user.getUsername().equals(message.getUser().getUsername())) {
@@ -778,7 +836,8 @@ try {
 
         }
     }
-    public void RemoveConv(Message message){
+
+    public void RemoveConv(Message message) {
         String reciever = "";
         List<Data> DeletFormSentMessages = new ArrayList<>();
         List<Data> DeletFormtInboxMessages = new ArrayList<>();
@@ -810,14 +869,16 @@ try {
         LocalDateTime now = LocalDateTime.now();
         System.out.println(dtf.format(now));
     }
-    public void Read (Message message){
+
+    public void Read(Message message) {
         System.out.println(message.getUser() + " Read");
         System.out.println("message : " + message.getData().getSubject() + "  " + message.getData().getSender() + " as  Read ");
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
         LocalDateTime now = LocalDateTime.now();
         System.out.println(dtf.format(now));
     }
-    public void UnReade(Message message){
+
+    public void UnReade(Message message) {
         System.out.println(message.getUser() + " UnRead");
         System.out.println("message : " + message.getData().getSubject() + "  " + message.getData().getSender() + " as  UnRead ");
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
@@ -825,30 +886,32 @@ try {
         System.out.println(dtf.format(now));
 
     }
+
     public void Archieve(Message message) throws IOException {
-        for (User user :RegisteredUsers) {
-            if(user.getUsername().equals(message.getUser().getUsername())){
+        for (User user : RegisteredUsers) {
+            if (user.getUsername().equals(message.getUser().getUsername())) {
                 user.ArhcievedData.add(message.getData());
                 try {
 
 
                     outputStream.writeObject(new Message(user, UserActions.Archieve, user.ArhcievedData));
                     outputStream.flush();
-                }catch (NullPointerException e){
+                } catch (NullPointerException e) {
 
                 }
             }
         }
     }
+
     public void Recover(Message message) throws IOException {
-        for (User user :RegisteredUsers) {
-           if(user.getUsername().equals(message.getUser().getUsername())){
-               user.DeletedMessages.remove(message.getData());
-               user.Inbox.add(message.getData());
-               user.ConversationsList.add(message.getData());
-               outputStream.writeObject(new Message(UserActions.Recover,user,user.DeletedMessages));
-               outputStream.flush();
-           }
+        for (User user : RegisteredUsers) {
+            if (user.getUsername().equals(message.getUser().getUsername())) {
+                user.DeletedMessages.remove(message.getData());
+                user.Inbox.add(message.getData());
+                user.ConversationsList.add(message.getData());
+                outputStream.writeObject(new Message(UserActions.Recover, user, user.DeletedMessages));
+                outputStream.flush();
+            }
         }
     }
 }

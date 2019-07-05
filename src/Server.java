@@ -1,19 +1,59 @@
 import Model.Message;
+import Model.User;
 
-import java.io.EOFException;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.List;
 
 public class Server implements Runnable {
     public static final int requestPort = 8888;
     public static final String serverIp = "localhost";
     private static ServerSocket requestServerSocket;
+    public static final String SERVER_DBROOT="C:\\Users\\asus\\Desktop\\Server\\src\\Database\\Users.ser";
+    public static void updateUsernames() throws IOException, ClassNotFoundException {
+        Object MUTEX_USERNAME = new Object();
+        synchronized (MUTEX_USERNAME) {
 
-    public static void main(String[] args) throws IOException {
+
+            FileInputStream fileInputStream = new FileInputStream(new File("src\\Database\\Username.ser"));
+            File file=new File("src\\Database\\Username.ser");
+            if(file.length()>0) {
+              ObjectInputStream  objectInputStream = new ObjectInputStream(fileInputStream);
+
+                ServerHandler.USERNAME_LIST = (List<String>) objectInputStream.readObject();
+
+                fileInputStream.close();
+                objectInputStream.close();
+            }
+        }
+    }
+    public static boolean UpdateAllusersList() throws IOException, ClassNotFoundException {
+
+        if(AllUsers.USERNAME_LIST.size() == 0) return true ;
+        for (String username : AllUsers.USERNAME_LIST) {
+            int split = username.lastIndexOf("@");
+            String directoryPath =  username.substring(0 , split);
+
+            FileInputStream inputStream = new FileInputStream(new File( SERVER_DBROOT+ directoryPath + "\\" + directoryPath +  ".ser"));
+            ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
+
+            ServerHandler.RegisteredUsers.add((User) objectInputStream.readObject());
+            System.out.println("All users : " + ServerHandler.RegisteredUsers);
+
+            inputStream.close();
+            objectInputStream.close();
+
+
+        }
+
+        return  true ;
+    }
+    public static void main(String[] args) throws IOException, ClassNotFoundException {
+//        updateUsernames();
+//        UpdateAllusersList();
         Server.start();
+
     }
 
     public static void start() throws IOException {
@@ -33,6 +73,8 @@ public class Server implements Runnable {
             }
         }
     }
+
+
 }
 
 class ServerRunner implements Runnable {
