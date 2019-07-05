@@ -39,7 +39,8 @@ public class User implements Serializable {
     public List<User> Blocked_Users = new ArrayList<>();
     public List<Data> wantToDeletConversation=new ArrayList<>();
     private boolean IsBlock=false;
-
+    public List<Data> ArhcievedData=new ArrayList<>();
+    public List<Data> DeletedMessages=new ArrayList<>();
     public boolean isBlock() {
         return IsBlock;
     }

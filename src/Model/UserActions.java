@@ -24,5 +24,8 @@ public enum UserActions {
     Refresh,
     ReplyMessage,
     Add_Favorite, DeleteFavoite,
+    UnRead,
+    Archieve,
+    Recover,
 
 }

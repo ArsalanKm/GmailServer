@@ -28,7 +28,7 @@ public class AllUsers implements Serializable{
             in = new ObjectInputStream(fileIn);
 
             All_ONLINE_USERS = (List<User>) in.readObject();
-            System.out.println(All_ONLINE_USERS.size());
+
 
             fileIn.close();
             in.close();
@@ -62,7 +62,6 @@ public class AllUsers implements Serializable{
         fileOut.close();
         out.close();
 
-        System.out.println("User added to the ALL USER file successfully . ");
     }
 
 }

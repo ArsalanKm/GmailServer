@@ -20,18 +20,29 @@ public class Message implements Serializable {
     private List<Data> Mydata = new ArrayList<>();
     private Data data;
     private List<User> Blocked_User = new ArrayList<>();
-
+public List<Data> ArchievedList=new ArrayList<>();
+public List<Data> DeletedMessageList=new ArrayList<>();
     public Message(User user, Data data) {
         this.user = user;
         this.data = data;
     }
-
+public Message (UserActions userActions,User user, List<Data> DeletedMessages){
+        this.user=user;
+this.userActions=userActions;
+        this.DeletedMessageList=DeletedMessages;
+}
     public Message(User user, Data data, UserActions userActions) {
         this.user = user;
         this.data = data;
         this.userActions = userActions;
     }
 
+    public Message (User user, UserActions userActions,List<Data> ArchievedList){
+        this.userActions=userActions;
+        this.user=user;
+        this.ArchievedList=ArchievedList;
+
+    }
     public Message(User user, List<Data> chatList, UserActions userActions) {
         this.ListOfConversation = chatList;
         this.user = user;
